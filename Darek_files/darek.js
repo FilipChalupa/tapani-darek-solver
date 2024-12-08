@@ -3,7 +3,7 @@
 const canvas = document.querySelector('canvas');
 const goal = document.querySelector('img')
 const status = document.querySelector('#status')
-const output = document.querySelector('output')
+const output = document.querySelector('#output')
 const outputImage = document.querySelector('#outputImage')
 
 const model = {
@@ -199,14 +199,17 @@ window.addEventListener('DOMContentLoaded', _ => {
     const words = await wordlist
     let order = 0
     let bestMisMatchPercentage = 100
+    const leaderboard = []
     for (const word of words) {
       order++
       const {misMatchPercentage, text, image} = await compare(word)
       status.innerText = `${order}/${words.length}`
       if (misMatchPercentage < bestMisMatchPercentage) {
+        leaderboard.unshift({misMatchPercentage, text})
         bestMisMatchPercentage = misMatchPercentage
         localStorage.setItem('best', JSON.stringify({misMatchPercentage, text}))
-        output.innerHTML = `Zatím nejlepší: ${text}<br/>Neshoda: ${Math.round(misMatchPercentage)} %`
+        localStorage.setItem('leaderboard', JSON.stringify({leaderboard}))
+        output.innerHTML = leaderboard.map(({misMatchPercentage, text}) => `<li>${text}: ${misMatchPercentage}%</li>`).join('')
         outputImage.src = image
       }
     }
