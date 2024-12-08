@@ -166,6 +166,12 @@ window.addEventListener('DOMContentLoaded', _ => {
 
   input.value = 'tápání';
   input.dispatchEvent(new Event('change'));
+
+  setTimeout(async () => {
+    const text = 'koule'.trim().toLowerCase().normalize();
+    await processInput(text)
+    redraw();
+  }, 2000)
 });
 
 function createProgram(gl, vs, fs) {
