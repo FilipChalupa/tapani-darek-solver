@@ -205,6 +205,7 @@ window.addEventListener('DOMContentLoaded', _ => {
       status.innerText = `${order}/${words.length}`
       if (misMatchPercentage < bestMisMatchPercentage) {
         bestMisMatchPercentage = misMatchPercentage
+        localStorage.setItem('best', JSON.stringify({misMatchPercentage, text}))
         output.innerHTML = `Zatím nejlepší: ${text}<br/>Neshoda: ${Math.round(misMatchPercentage)} %`
         outputImage.src = image
       }
