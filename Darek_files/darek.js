@@ -1,5 +1,9 @@
 'use strict';
 
+const canvas = document.querySelector('canvas');
+const goal = document.querySelector('img')
+const status = document.querySelector('#status')
+
 const model = {
   tilt: 0.24,
   angle: -0.4
@@ -109,12 +113,13 @@ function draw(gl) {
 }
 
 window.addEventListener('DOMContentLoaded', _ => {
-  const canvas = document.querySelector('canvas');
   const dpr = window.devicePixelRatio || 1;
   canvas.width = canvas.clientWidth * dpr;
   canvas.height = canvas.clientHeight * dpr;
 
-  const gl = canvas.getContext('webgl2');
+  const gl = canvas.getContext('webgl2', {
+    preserveDrawingBuffer: true,
+  });
   if(!gl) {
     alert('Litujeme, Váš prohlížeč nepodporuje technologii WebGL2 potřebnou pro tuto stránku.');
     return;
@@ -167,11 +172,33 @@ window.addEventListener('DOMContentLoaded', _ => {
   input.value = 'tápání';
   input.dispatchEvent(new Event('change'));
 
-  setTimeout(async () => {
-    const text = 'koule'.trim().toLowerCase().normalize();
+  // Test starts here
+  const compare = async (word) => {
+    const text = word.trim().toLowerCase().normalize();
+    input.value = text
+    await redraw();
     await processInput(text)
-    redraw();
-  }, 2000)
+    const misMatchPercentage = await new Promise(resolve => {
+      canvas.toBlob(async blob => {
+        const attempt = URL.createObjectURL(blob);
+        await resemble(attempt).compareTo(goal.src).onComplete(data => {
+          resolve(data.rawMisMatchPercentage)
+        })
+      }, 'image/png')
+    })
+    console.log(`${word},${misMatchPercentage}`)
+    return misMatchPercentage
+  }
+
+  setTimeout(async () => {
+    const words = await wordlist
+    let order = 0
+    for (const word of words) {
+      order++
+      await compare(word)
+      status.innerText = `${order}/${words.length}`
+    }
+  }, 500)
 });
 
 function createProgram(gl, vs, fs) {

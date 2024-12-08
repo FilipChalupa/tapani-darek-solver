@@ -6,8 +6,22 @@
 
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="stylesheet" type="text/css" href="./Darek_files/darek.css" />
-		<script type="text/javascript" src="./Darek_files/darek.js"></script>
+		<script
+			type="text/javascript"
+			src="https://rsmbl.github.io/Resemble.js/resemble.js"
+		></script>
+		<script type="text/javascript" src="./Darek_files/darek.js" defer></script>
 		<title>Dárek</title>
+		<style>
+			body {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 1rem;
+			}
+			#status {
+				text-align: right;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="main">
@@ -22,6 +36,10 @@
 			</div>
 			<label id="target-row">Váš cíl:</label>
 			<img src="./Darek_files/predloha.png" />
+		</div>
+		<div>
+			<div id="status"></div>
+			<output></output>
 		</div>
 	</body>
 </html>
