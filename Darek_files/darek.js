@@ -3,6 +3,8 @@
 const canvas = document.querySelector('canvas');
 const goal = document.querySelector('img')
 const status = document.querySelector('#status')
+const output = document.querySelector('output')
+const outputImage = document.querySelector('#outputImage')
 
 const model = {
   tilt: 0.24,
@@ -178,25 +180,34 @@ window.addEventListener('DOMContentLoaded', _ => {
     input.value = text
     await redraw();
     await processInput(text)
-    const misMatchPercentage = await new Promise(resolve => {
+    const {misMatchPercentage, image} = await new Promise(resolve => {
       canvas.toBlob(async blob => {
         const attempt = URL.createObjectURL(blob);
         await resemble(attempt).compareTo(goal.src).onComplete(data => {
-          resolve(data.rawMisMatchPercentage)
+          resolve({
+            image: attempt,
+            misMatchPercentage: data.rawMisMatchPercentage
+          })
         })
       }, 'image/png')
     })
     console.log(`${word},${misMatchPercentage}`)
-    return misMatchPercentage
+    return {misMatchPercentage, text, image}
   }
 
   setTimeout(async () => {
     const words = await wordlist
     let order = 0
+    let bestMisMatchPercentage = 100
     for (const word of words) {
       order++
-      await compare(word)
+      const {misMatchPercentage, text, image} = await compare(word)
       status.innerText = `${order}/${words.length}`
+      if (misMatchPercentage < bestMisMatchPercentage) {
+        bestMisMatchPercentage = misMatchPercentage
+        output.innerHTML = `Zatím nejlepší: ${text}<br/>Neshoda: ${Math.round(misMatchPercentage)} %`
+        outputImage.src = image
+      }
     }
   }, 500)
 });
