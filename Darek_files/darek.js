@@ -178,8 +178,11 @@ window.addEventListener('DOMContentLoaded', _ => {
   const compare = async (word) => {
     const text = word.trim().toLowerCase().normalize();
     input.value = text
-    await redraw();
     await processInput(text)
+    await new Promise(async resolve => {
+      await redraw();
+      requestAnimationFrame(resolve)
+    })
     const {misMatchPercentage, image} = await new Promise(resolve => {
       canvas.toBlob(async blob => {
         const attempt = URL.createObjectURL(blob);
